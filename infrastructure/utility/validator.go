@@ -8,18 +8,20 @@ import (
 	"github.com/go-ozzo/ozzo-validation/v4"
 )
 
-func Validator(data io.ReadCloser, request interface{}, schema validation.MapRule) (interface{}, error) {
-	err := json.NewDecoder(data).Decode(&request)
+
+func Validator(data io.ReadCloser, request interface{}, fields ...*validation.FieldRules) error{
+	fmt.Printf("Just recieved: %v\n", request)
+	err := json.NewDecoder(data).Decode(request)
 
 	if err != nil {
-		return nil, fmt.Errorf("Invalid JSON body")
+		return fmt.Errorf("Invalid JSON body")
 	}
 
-	verr := validation.Validate(request, schema)
+	verr := validation.ValidateStruct(request, fields...)
 
 	if verr != nil {
-		return nil, verr
+		return verr
 	}
 
-	return request, nil
+	return nil
 }
