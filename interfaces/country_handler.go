@@ -62,8 +62,6 @@ func(c *CountryHandler) CreateCountry(res http.ResponseWriter, req *http.Request
 		return
 	}
 
-	log.Println(request.)
-
 	res.Header().Set("Content-Type", "application/json")
 	res.WriteHeader(http.StatusOK)
 	json.NewEncoder(res).Encode(request)
