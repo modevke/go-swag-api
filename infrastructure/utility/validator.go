@@ -2,26 +2,60 @@ package utility
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
+	"strings"
 
 	"github.com/go-ozzo/ozzo-validation/v4"
 )
 
 
-func Validator(data io.ReadCloser, request interface{}, fields ...*validation.FieldRules) error{
-	fmt.Printf("Just recieved: %v\n", request)
+func ValidateBody(data io.ReadCloser, request interface{}, fields ...*validation.FieldRules) []ResponseError{
+	
+	var errResponses []ResponseError
 	err := json.NewDecoder(data).Decode(request)
 
 	if err != nil {
-		return fmt.Errorf("Invalid JSON body")
+
+		errResponses = append(errResponses, ResponseError{
+			Code: "4000",
+			Description: "Invalid JSON body",
+		})
+
+		return errResponses
 	}
 
 	verr := validation.ValidateStruct(request, fields...)
 
 	if verr != nil {
-		return verr
+		verrStr := strings.Split(verr.Error(), ";")
+
+		for _, val := range verrStr{
+			errResponses = append(errResponses, ResponseError{
+				Code: "40001",
+				Description: val,
+			})
+		}
+		return errResponses
 	}
 
-	return nil
+	return errResponses
+}
+
+func ValidateParams(request interface{}, fields ...*validation.FieldRules) []ResponseError {
+	var errResponses []ResponseError
+	verr := validation.ValidateStruct(request, fields...)
+
+	if verr != nil {
+		verrStr := strings.Split(verr.Error(), ";")
+
+		for _, val := range verrStr{
+			errResponses = append(errResponses, ResponseError{
+				Code: "40002",
+				Description: val,
+			})
+		}
+		return errResponses
+	}
+
+	return errResponses
 }

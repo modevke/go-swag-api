@@ -2,7 +2,7 @@ package utility
 
 type ResponseError struct{
 	Code			string	`json:"code"`
-	Deescription	string	`json:"description"`
+	Description	string	`json:"description"`
 }
 
 type Responses struct{
